@@ -40,13 +40,10 @@ public class AntiCheatingStrategy implements SeatingStrategy {
 
     private boolean isSafe(Seat targetSeat, Student currentStudent, List<Allocation> existingAllocations, List<Student> allStudents, List<Seat> allSeats) {
         for (Allocation alloc : existingAllocations) {
-            // 1. Get the Neighbor's Seat and Student details
             Seat neighborSeat = getSeatById(alloc.getSeatId(), allSeats);
             Student neighborStudent = getStudentById(alloc.getStudentId(), allStudents);
 
             if (neighborSeat == null || neighborStudent == null) continue;
-
-            // 2. Check if they are physically adjacent
             if (isAdjacent(targetSeat, neighborSeat)) {
                 // 3. Check if they are from the same branch
                 if (neighborStudent.getBranch().equals(currentStudent.getBranch())) {
@@ -55,15 +52,12 @@ public class AntiCheatingStrategy implements SeatingStrategy {
                 }
             }
         }
-        return true; // No conflicts found
+        return true;
     }
 
     private boolean isAdjacent(Seat s1, Seat s2) {
         int rowDiff = Math.abs(s1.getRow() - s2.getRow());
         int colDiff = Math.abs(s1.getCol() - s2.getCol());
-
-        // Adjacent if row diff <= 1 AND col diff <= 1
-        // (excluding the case where they are the same seat, though isSeatOccupied handles that)
         return rowDiff <= 1 && colDiff <= 1;
     }
 
