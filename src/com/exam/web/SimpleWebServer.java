@@ -19,41 +19,30 @@ public class SimpleWebServer {
         int port = 8080;
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 
-        // Core Files
         server.createContext("/", new StaticFileHandler());
-
-        // API - Management
         server.createContext("/api/reset", new ClearDataHandler());
         server.createContext("/api/rooms/batch", new BatchRoomHandler());
         server.createContext("/api/students/batch", new BatchStudentHandler());
         server.createContext("/api/allocate", new AllocationHandler());
-
-        // API - Read Data
+        
         server.createContext("/api/view", new ViewHandler());
-        server.createContext("/api/stats", new StatsHandler()); // NEW: Analytics
+        server.createContext("/api/stats", new StatsHandler()); 
 
         server.setExecutor(null);
-        System.out.println("🚀 Portfolio App Started: http://localhost:" + port);
+        System.out.println("App Started on port number:" + port);
         server.start();
     }
-
-    // --- NEW: DASHBOARD STATS ---
     static class StatsHandler implements HttpHandler {
         public void handle(HttpExchange ex) throws IOException {
             try (Connection c = DBConnection.getConnection(); Statement s = c.createStatement()) {
-                // 1. Total Rooms
                 ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM rooms");
                 rs.next(); int rooms = rs.getInt(1);
 
-                // 2. Total Capacity
                 rs = s.executeQuery("SELECT COALESCE(SUM(capacity),0) FROM rooms");
                 rs.next(); int capacity = rs.getInt(1);
 
-                // 3. Registered Students
                 rs = s.executeQuery("SELECT COUNT(*) FROM students");
                 rs.next(); int students = rs.getInt(1);
-
-                // 4. Allocated Seats
                 rs = s.executeQuery("SELECT COUNT(*) FROM allocations");
                 rs.next(); int allocated = rs.getInt(1);
 
@@ -66,7 +55,6 @@ public class SimpleWebServer {
         }
     }
 
-    // --- EXISTING HANDLERS (Optimized) ---
     static class ClearDataHandler implements HttpHandler {
         public void handle(HttpExchange ex) throws IOException {
             if (!"POST".equalsIgnoreCase(ex.getRequestMethod())) return;
@@ -140,7 +128,7 @@ public class SimpleWebServer {
         public void handle(HttpExchange ex) throws IOException {
             try {
                 AllocationService service = new AllocationService();
-                long roomId = 1; // Default
+                long roomId = 1; 
                 try(Connection c=DBConnection.getConnection(); ResultSet rs=c.createStatement().executeQuery("SELECT id FROM rooms LIMIT 1")) {
                     if(rs.next()) roomId = rs.getLong(1);
                 }
