@@ -10,8 +10,6 @@ import java.util.List;
 public class AllocationDAO {
 
     public boolean bulkSaveAllocations(List<Allocation> allocations) {
-        // We use ON DUPLICATE KEY UPDATE to prevent crashing if we run it twice for the same exam
-        // (Optional optimization, but good for testing)
         String sql = "INSERT INTO allocations (exam_id, student_id, seat_id) VALUES (?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection()) {
